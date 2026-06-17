@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Workout Plan">
-<meta name="theme-color" content="#0f1117">
+<meta name="theme-color" content="#154734">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-512.png">
 <link rel="manifest" href="manifest.json">
@@ -22,16 +22,16 @@
     padding: 16px 16px calc(86px + env(safe-area-inset-bottom)) 16px;
     min-height: 100vh; overscroll-behavior-y: none;
   }
-  h1 { text-align: center; font-size: 1.3rem; color: #60a5fa; margin-bottom: 4px; padding-top: env(safe-area-inset-top); }
+  h1 { text-align: center; font-size: 1.3rem; color: #FFB81C; margin-bottom: 4px; padding-top: env(safe-area-inset-top); }
   .subtitle { text-align: center; font-size: 0.8rem; color: #94a3b8; margin-bottom: 18px; }
 
   /* ---- Install banner ---- */
   #installBanner {
-    display: none; background: #1a2744; border: 1px solid #2563eb55; border-radius: 12px;
+    display: none; background: #16241c; border: 1px solid #FFB81C55; border-radius: 12px;
     padding: 10px 14px; margin-bottom: 16px; font-size: 0.78rem; color: #cbd5e1; line-height: 1.5;
     position: relative;
   }
-  #installBanner b { color: #93c5fd; }
+  #installBanner b { color: #FFD978; }
   #installBanner .close-banner {
     position: absolute; top: 6px; right: 10px; background: none; border: none; color: #64748b;
     font-size: 1rem; cursor: pointer; padding: 4px;
@@ -40,33 +40,33 @@
   /* ---- Sub-tabs (used inside Weeks view) ---- */
   .phase-tabs { display: flex; gap: 8px; justify-content: center; margin-bottom: 18px; flex-wrap: wrap; }
   .tab { padding: 8px 18px; border-radius: 999px; border: 2px solid #334155; background: transparent; color: #94a3b8; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s; }
-  .tab.active { background: #2563eb; border-color: #2563eb; color: #fff; }
-  .tab:hover:not(.active) { border-color: #60a5fa; color: #60a5fa; }
+  .tab.active { background: #154734; border-color: #154734; color: #fff; }
+  .tab:hover:not(.active) { border-color: #FFB81C; color: #FFB81C; }
 
-  .phase-box { background: #1e2330; border-radius: 16px; padding: 16px; margin-bottom: 16px; border-left: 4px solid #2563eb; }
-  .phase-title { font-size: 1rem; font-weight: 700; color: #60a5fa; margin-bottom: 4px; }
+  .phase-box { background: #1e2330; border-radius: 16px; padding: 16px; margin-bottom: 16px; border-left: 4px solid #154734; }
+  .phase-title { font-size: 1rem; font-weight: 700; color: #FFB81C; margin-bottom: 4px; }
   .phase-desc { font-size: 0.82rem; color: #94a3b8; margin-bottom: 14px; }
   .week-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
   .week-card { background: #252d3d; border-radius: 12px; padding: 14px; }
   .week-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
   .week-num { font-weight: 700; font-size: 0.95rem; color: #f1f5f9; }
   .week-tag { font-size: 0.72rem; padding: 2px 10px; border-radius: 999px; font-weight: 600; }
-  .tag-build { background: #1d4ed8; color: #bfdbfe; }
-  .tag-progress { background: #065f46; color: #6ee7b7; }
-  .tag-peak { background: #7c2d12; color: #fed7aa; }
+  .tag-build { background: #0F3A28; color: #BFE8D4; }
+  .tag-progress { background: #7A5C00; color: #FFD978; }
+  .tag-peak { background: #78350F; color: #fed7aa; }
   .day-row { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 7px; }
-  .day-label { font-size: 0.72rem; font-weight: 700; color: #60a5fa; min-width: 28px; padding-top: 2px; }
+  .day-label { font-size: 0.72rem; font-weight: 700; color: #FFB81C; min-width: 28px; padding-top: 2px; }
   .day-content { font-size: 0.78rem; color: #cbd5e1; line-height: 1.45; }
   .day-content b { color: #f8fafc; }
   .rest-day { color: #64748b; font-style: italic; }
-  .tip-box { background: #1a2744; border: 1px solid #2563eb44; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; }
-  .tip-title { font-size: 0.82rem; font-weight: 700; color: #93c5fd; margin-bottom: 6px; }
+  .tip-box { background: #16241c; border: 1px solid #FFB81C33; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; }
+  .tip-title { font-size: 0.82rem; font-weight: 700; color: #FFD978; margin-bottom: 6px; }
   .tip-list { list-style: none; }
   .tip-list li { font-size: 0.78rem; color: #94a3b8; padding: 2px 0; padding-left: 14px; position: relative; }
-  .tip-list li::before { content: "->"; position: absolute; left: 0; color: #3b82f6; }
+  .tip-list li::before { content: "->"; position: absolute; left: 0; color: #FFB81C; }
   .overview-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
   .stat-card { background: #252d3d; border-radius: 10px; padding: 12px; text-align: center; }
-  .stat-num { font-size: 1.6rem; font-weight: 800; color: #60a5fa; }
+  .stat-num { font-size: 1.6rem; font-weight: 800; color: #FFB81C; }
   .stat-label { font-size: 0.72rem; color: #64748b; margin-top: 2px; }
 
   .view { display: none; }
@@ -74,38 +74,38 @@
 
   /* ---- Today view ---- */
   .week-stepper { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 14px; }
-  .week-stepper button { background: #1e2330; border: 1px solid #334155; color: #60a5fa; font-size: 1rem; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; }
-  .week-stepper button:active { background: #2563eb; color: #fff; }
+  .week-stepper button { background: #1e2330; border: 1px solid #334155; color: #FFB81C; font-size: 1rem; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; }
+  .week-stepper button:active { background: #154734; color: #fff; }
   .week-stepper .week-label { font-size: 0.95rem; font-weight: 700; color: #f1f5f9; min-width: 110px; text-align: center; }
   .day-pills { display: flex; gap: 6px; justify-content: center; margin-bottom: 18px; flex-wrap: wrap; }
   .day-pill { padding: 7px 0; width: 42px; text-align: center; border-radius: 10px; border: 2px solid #334155; background: transparent; color: #94a3b8; cursor: pointer; font-size: 0.72rem; font-weight: 700; }
-  .day-pill.active { background: #2563eb; border-color: #2563eb; color: #fff; }
-  .today-card { background: #1e2330; border-radius: 16px; padding: 18px; border-left: 4px solid #2563eb; }
+  .day-pill.active { background: #154734; border-color: #154734; color: #fff; }
+  .today-card { background: #1e2330; border-radius: 16px; padding: 18px; border-left: 4px solid #154734; }
   .today-card-title { font-size: 1.05rem; font-weight: 700; color: #f1f5f9; margin-bottom: 2px; }
-  .today-card-phase { font-size: 0.75rem; color: #60a5fa; margin-bottom: 16px; }
+  .today-card-phase { font-size: 0.75rem; color: #FFB81C; margin-bottom: 16px; }
   .exercise-row { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid #2a3242; }
   .exercise-row:last-child { border-bottom: none; }
-  .exercise-row input[type="checkbox"] { width: 20px; height: 20px; margin-top: 1px; accent-color: #2563eb; flex-shrink: 0; }
+  .exercise-row input[type="checkbox"] { width: 20px; height: 20px; margin-top: 1px; accent-color: #FFB81C; flex-shrink: 0; }
   .exercise-row label { font-size: 0.85rem; color: #e2e8f0; line-height: 1.4; }
   .exercise-row.checked label { color: #4b5563; text-decoration: line-through; }
   .rest-card { text-align: center; padding: 30px 10px; color: #94a3b8; font-size: 0.9rem; font-style: italic; }
   .start-date-row { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 18px; font-size: 0.78rem; color: #64748b; }
   .start-date-row input { background: #1e2330; border: 1px solid #334155; color: #e2e8f0; border-radius: 8px; padding: 4px 8px; font-size: 0.78rem; }
-  .start-date-row a { color: #60a5fa; cursor: pointer; text-decoration: underline; }
+  .start-date-row a { color: #FFB81C; cursor: pointer; text-decoration: underline; }
 
   /* ---- Bottom nav (app style) ---- */
   #bottomNav {
     position: fixed; bottom: 0; left: 0; right: 0; display: flex;
-    background: #161a24; border-top: 1px solid #262d3d;
+    background: #154734; border-top: 1px solid #0d2e1f;
     padding-bottom: env(safe-area-inset-bottom); z-index: 50;
   }
   #bottomNav button {
-    flex: 1; background: none; border: none; color: #64748b; padding: 10px 0 8px;
+    flex: 1; background: none; border: none; color: #9fd6b8; padding: 10px 0 8px;
     display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer;
   }
   #bottomNav button .nav-icon { font-size: 1.25rem; line-height: 1; }
   #bottomNav button .nav-label { font-size: 0.65rem; font-weight: 600; }
-  #bottomNav button.active { color: #60a5fa; }
+  #bottomNav button.active { color: #FFB81C; }
 </style>
 </head>
 <body>
@@ -182,8 +182,8 @@
   </div>
 
   <div id="phase2" style="display:none">
-    <div class="phase-box" style="border-left-color:#10b981">
-      <div class="phase-title" style="color:#34d399">Phase 2 — Build (Weeks 4-7)</div>
+    <div class="phase-box" style="border-left-color:#FFB81C">
+      <div class="phase-title" style="color:#FFD978">Phase 2 — Build (Weeks 4-7)</div>
       <div class="phase-desc">Increase weight progressively. Add supersets on Saturday. Treadmill introduces incline and longer intervals. RPE should reach 7/10 on working sets.</div>
       <div class="week-grid">
 
@@ -222,7 +222,7 @@
 
         <div class="week-card">
           <div class="week-header"><span class="week-num">Week 7</span><span class="week-tag tag-progress">Deload</span></div>
-          <div class="day-row"><span class="day-label">NOTE</span><div class="day-content" style="color:#fbbf24"><b>Deload Week — reduce weight 20%, same reps. Let your body recover. Joints and tendons need this.</b></div></div>
+          <div class="day-row"><span class="day-label">NOTE</span><div class="day-content" style="color:#FFB81C"><b>Deload Week — reduce weight 20%, same reps. Let your body recover. Joints and tendons need this.</b></div></div>
           <div class="day-row"><span class="day-label">MON</span><div class="day-content"><b>Push — light</b><br>DB Bench 3x10 (80% of Wk 6 weight)<br>Shoulder Press 3x10<br>Pushups 2x15</div></div>
           <div class="day-row"><span class="day-label">TUE</span><div class="day-content"><b>Treadmill — 25 min brisk walk</b><br>No running this week</div></div>
           <div class="day-row"><span class="day-label">WED</span><div class="day-content rest-day">Rest</div></div>
@@ -237,8 +237,8 @@
   </div>
 
   <div id="phase3" style="display:none">
-    <div class="phase-box" style="border-left-color:#f97316">
-      <div class="phase-title" style="color:#fb923c">Phase 3 — Peak (Weeks 8-10)</div>
+    <div class="phase-box" style="border-left-color:#B45309">
+      <div class="phase-title" style="color:#FDBA74">Phase 3 — Peak (Weeks 8-10)</div>
       <div class="phase-desc">Push heavier weights, 3-4 sets of 6-8 reps. Treadmill sessions become your hardest yet — interval sprints and longer steady runs. You should feel strong and capable by Week 10.</div>
       <div class="week-grid">
 
@@ -572,7 +572,7 @@ function renderToday() {
   html += '<div class="today-card-title">' + dayData.title + '</div>';
   html += '<div class="today-card-phase">Week ' + currentWeek + ' · <span class="week-tag ' + week.cls + '">' + week.tag + '</span></div>';
   if (week.note) {
-    html += '<div style="color:#fbbf24; font-size:0.78rem; margin-bottom:14px;"><b>' + week.note + '</b></div>';
+    html += '<div style="color:#FFB81C; font-size:0.78rem; margin-bottom:14px;"><b>' + week.note + '</b></div>';
   }
   html += '</div>';
   card.innerHTML = html;
