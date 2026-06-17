@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>10-Week Workout Plan</title>
+
+<!-- iOS "Add to Home Screen" / standalone app support -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Workout Plan">
+<meta name="theme-color" content="#0f1117">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-512.png">
+<link rel="manifest" href="manifest.json">
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { background: #0f1117; }
+  body {
+    font-family: 'Segoe UI', -apple-system, sans-serif; background: #0f1117; color: #e8eaf0;
+    padding: 16px 16px calc(86px + env(safe-area-inset-bottom)) 16px;
+    min-height: 100vh; overscroll-behavior-y: none;
+  }
+  h1 { text-align: center; font-size: 1.3rem; color: #60a5fa; margin-bottom: 4px; padding-top: env(safe-area-inset-top); }
+  .subtitle { text-align: center; font-size: 0.8rem; color: #94a3b8; margin-bottom: 18px; }
+
+  /* ---- Install banner ---- */
+  #installBanner {
+    display: none; background: #1a2744; border: 1px solid #2563eb55; border-radius: 12px;
+    padding: 10px 14px; margin-bottom: 16px; font-size: 0.78rem; color: #cbd5e1; line-height: 1.5;
+    position: relative;
+  }
+  #installBanner b { color: #93c5fd; }
+  #installBanner .close-banner {
+    position: absolute; top: 6px; right: 10px; background: none; border: none; color: #64748b;
+    font-size: 1rem; cursor: pointer; padding: 4px;
+  }
+
+  /* ---- Sub-tabs (used inside Weeks view) ---- */
+  .phase-tabs { display: flex; gap: 8px; justify-content: center; margin-bottom: 18px; flex-wrap: wrap; }
+  .tab { padding: 8px 18px; border-radius: 999px; border: 2px solid #334155; background: transparent; color: #94a3b8; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s; }
+  .tab.active { background: #2563eb; border-color: #2563eb; color: #fff; }
+  .tab:hover:not(.active) { border-color: #60a5fa; color: #60a5fa; }
+
+  .phase-box { background: #1e2330; border-radius: 16px; padding: 16px; margin-bottom: 16px; border-left: 4px solid #2563eb; }
+  .phase-title { font-size: 1rem; font-weight: 700; color: #60a5fa; margin-bottom: 4px; }
+  .phase-desc { font-size: 0.82rem; color: #94a3b8; margin-bottom: 14px; }
+  .week-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .week-card { background: #252d3d; border-radius: 12px; padding: 14px; }
+  .week-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .week-num { font-weight: 700; font-size: 0.95rem; color: #f1f5f9; }
+  .week-tag { font-size: 0.72rem; padding: 2px 10px; border-radius: 999px; font-weight: 600; }
+  .tag-build { background: #1d4ed8; color: #bfdbfe; }
+  .tag-progress { background: #065f46; color: #6ee7b7; }
+  .tag-peak { background: #7c2d12; color: #fed7aa; }
+  .day-row { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 7px; }
+  .day-label { font-size: 0.72rem; font-weight: 700; color: #60a5fa; min-width: 28px; padding-top: 2px; }
+  .day-content { font-size: 0.78rem; color: #cbd5e1; line-height: 1.45; }
+  .day-content b { color: #f8fafc; }
+  .rest-day { color: #64748b; font-style: italic; }
+  .tip-box { background: #1a2744; border: 1px solid #2563eb44; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; }
+  .tip-title { font-size: 0.82rem; font-weight: 700; color: #93c5fd; margin-bottom: 6px; }
+  .tip-list { list-style: none; }
+  .tip-list li { font-size: 0.78rem; color: #94a3b8; padding: 2px 0; padding-left: 14px; position: relative; }
+  .tip-list li::before { content: "->"; position: absolute; left: 0; color: #3b82f6; }
+  .overview-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+  .stat-card { background: #252d3d; border-radius: 10px; padding: 12px; text-align: center; }
+  .stat-num { font-size: 1.6rem; font-weight: 800; color: #60a5fa; }
+  .stat-label { font-size: 0.72rem; color: #64748b; margin-top: 2px; }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ---- Today view ---- */
+  .week-stepper { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 14px; }
+  .week-stepper button { background: #1e2330; border: 1px solid #334155; color: #60a5fa; font-size: 1rem; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; }
+  .week-stepper button:active { background: #2563eb; color: #fff; }
+  .week-stepper .week-label { font-size: 0.95rem; font-weight: 700; color: #f1f5f9; min-width: 110px; text-align: center; }
+  .day-pills { display: flex; gap: 6px; justify-content: center; margin-bottom: 18px; flex-wrap: wrap; }
+  .day-pill { padding: 7px 0; width: 42px; text-align: center; border-radius: 10px; border: 2px solid #334155; background: transparent; color: #94a3b8; cursor: pointer; font-size: 0.72rem; font-weight: 700; }
+  .day-pill.active { background: #2563eb; border-color: #2563eb; color: #fff; }
+  .today-card { background: #1e2330; border-radius: 16px; padding: 18px; border-left: 4px solid #2563eb; }
+  .today-card-title { font-size: 1.05rem; font-weight: 700; color: #f1f5f9; margin-bottom: 2px; }
+  .today-card-phase { font-size: 0.75rem; color: #60a5fa; margin-bottom: 16px; }
+  .exercise-row { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid #2a3242; }
+  .exercise-row:last-child { border-bottom: none; }
+  .exercise-row input[type="checkbox"] { width: 20px; height: 20px; margin-top: 1px; accent-color: #2563eb; flex-shrink: 0; }
+  .exercise-row label { font-size: 0.85rem; color: #e2e8f0; line-height: 1.4; }
+  .exercise-row.checked label { color: #4b5563; text-decoration: line-through; }
+  .rest-card { text-align: center; padding: 30px 10px; color: #94a3b8; font-size: 0.9rem; font-style: italic; }
+  .start-date-row { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 18px; font-size: 0.78rem; color: #64748b; }
+  .start-date-row input { background: #1e2330; border: 1px solid #334155; color: #e2e8f0; border-radius: 8px; padding: 4px 8px; font-size: 0.78rem; }
+  .start-date-row a { color: #60a5fa; cursor: pointer; text-decoration: underline; }
+
+  /* ---- Bottom nav (app style) ---- */
+  #bottomNav {
+    position: fixed; bottom: 0; left: 0; right: 0; display: flex;
+    background: #161a24; border-top: 1px solid #262d3d;
+    padding-bottom: env(safe-area-inset-bottom); z-index: 50;
+  }
+  #bottomNav button {
+    flex: 1; background: none; border: none; color: #64748b; padding: 10px 0 8px;
+    display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer;
+  }
+  #bottomNav button .nav-icon { font-size: 1.25rem; line-height: 1; }
+  #bottomNav button .nav-label { font-size: 0.65rem; font-weight: 600; }
+  #bottomNav button.active { color: #60a5fa; }
+</style>
+</head>
+<body>
+
+<h1>10-Week Upper Body &amp; Cardio Plan</h1>
+<p class="subtitle">For a 49-year-old returning to fitness — smart, progressive, effective</p>
+
+<div id="installBanner">
+  <button class="close-banner" onclick="document.getElementById('installBanner').style.display='none'">&times;</button>
+  <b>Install this as an app:</b> tap the Share icon <span style="white-space:nowrap">⬆️</span> in Safari, then choose <b>"Add to Home Screen"</b>.
+</div>
+
+<!-- ===== TODAY VIEW ===== -->
+<div id="view-today" class="view active">
+  <div class="start-date-row" id="startDateRow"></div>
+  <div class="week-stepper">
+    <button onclick="stepWeek(-1)">‹</button>
+    <div class="week-label" id="weekLabel">Week 1 of 10</div>
+    <button onclick="stepWeek(1)">›</button>
+  </div>
+  <div class="day-pills" id="dayPills"></div>
+  <div id="todayCard"></div>
+</div>
+
+<!-- ===== WEEKS VIEW ===== -->
+<div id="view-weeks" class="view">
+  <div class="phase-tabs">
+    <button class="tab active" data-phase="phase1" onclick="showPhase('phase1')">Phase 1 (Wks 1-3)</button>
+    <button class="tab" data-phase="phase2" onclick="showPhase('phase2')">Phase 2 (Wks 4-7)</button>
+    <button class="tab" data-phase="phase3" onclick="showPhase('phase3')">Phase 3 (Wks 8-10)</button>
+  </div>
+
+  <div id="phase1">
+    <div class="phase-box">
+      <div class="phase-title">Phase 1 — Foundation (Weeks 1-3)</div>
+      <div class="phase-desc">Light-to-moderate weight. Focus on form, full range of motion, and waking up the muscles. Keep treadmill at a brisk walk or light jog. Stop well short of failure.</div>
+      <div class="week-grid">
+
+        <div class="week-card">
+          <div class="week-header"><span class="week-num">Week 1</span><span class="week-tag tag-build">Foundation</span></div>
+          <div class="day-row"><span class="day-label">MON</span><div class="day-content"><b>Push Day</b><br>DB Bench Press 3x10<br>Shoulder Press (DB) 3x10<br>Incline Push-up 2x12<br>Tricep Overhead Extension 3x12</div></div>
+          <div class="day-row"><span class="day-label">TUE</span><div class="day-content"><b>Treadmill — 20 min</b><br>5 min easy walk warm-up<br>10 min brisk walk (3.5-4 mph)<br>5 min cooldown walk</div></div>
+          <div class="day-row"><span class="day-label">WED</span><div class="day-content rest-day">Rest or 15-min light walk</div></div>
+          <div class="day-row"><span class="day-label">THU</span><div class="day-content"><b>Pull Day</b><br>Seated Cable Row 3x10<br>Lat Pulldown 3x10<br>DB Bicep Curl 3x12<br>Face Pull (cable/band) 3x15</div></div>
+          <div class="day-row"><span class="day-label">FRI</span><div class="day-content"><b>Treadmill — 20 min</b><br>Same as Tuesday</div></div>
+          <div class="day-row"><span class="day-label">SAT</span><div class="day-content"><b>Full Upper Body</b><br>DB Bench 3x10<br>Bent-Over DB Row 3x10<br>Lateral Raise 3x12<br>Hammer Curl 3x12<br>Tricep Pushdown 3x12</div></div>
+          <div class="day-row"><span class="day-label">SUN</span><div class="day-content rest-day">Complete rest</div></div>
+        </div>
+
+        <div class="week-card">
+          <div class="week-header"><span class="week-num">Week 2</span><span class="week-tag tag-build">Foundation</span></div>
+          <div class="day-row"><span class="day-label">MON</span><div class="day-content"><b>Push Day</b><br>DB Bench 3x10 (slight weight increase)<br>Arnold Press 3x10<br>Cable Chest Fly 3x12<br>Skull Crusher 3x12</div></div>
+          <div class="day-row"><span class="day-label">TUE</span><div class="day-content"><b>Treadmill — 25 min</b><br>5 min walk then 15 min at 3.8-4.2 mph<br>5 min cooldown</div></div>
+          <div class="day-row"><span class="day-label">WED</span><div class="day-content rest-day">Rest or light walk</div></div>
+          <div class="day-row"><span class="day-label">THU</span><div class="day-content"><b>Pull Day</b><br>Lat Pulldown 3x10<br>1-Arm DB Row 3x10 each side<br>Incline DB Curl 3x12<br>Rear Delt Fly 3x15</div></div>
+          <div class="day-row"><span class="day-label">FRI</span><div class="day-content"><b>Treadmill — 25 min</b><br>Same as Tuesday</div></div>
+          <div class="day-row"><span class="day-label">SAT</span><div class="day-content"><b>Full Upper Body</b><br>Incline DB Press 3x10<br>Seated Cable Row 3x10<br>DB Shoulder Press 3x10<br>EZ-Bar Curl 3x12<br>Overhead Tricep Ext 3x12</div></div>
+          <div class="day-row"><span class="day-label">SUN</span><div class="day-content rest-day">Complete rest</div></div>
+        </div>
+
+        <div class="week-card">
+          <div class="week-header"><span class="week-num">Week 3</span><span class="week-tag tag-build">Foundation</span></div>
+          <div class="day-row"><span class="day-label">MON</span><div class="day-content"><b>Push Day</b><br>Flat DB Bench 3x12<br>DB Shoulder Press 3x12<br>Incline DB Fly 3x12<br>Close-Grip Pushup 2x max</div></div>
+          <div class="day-row"><span class="day-label">TUE</span><div class="day-content"><b>Treadmill — 25 min</b><br>Introduce 2x3-min jog intervals<br>Walk 2 min between each</div></div>
+          <div class="day-row"><span class="day-label">WED</span><div class="day-content rest-day">Rest or light walk</div></div>
+          <div class="day-row"><span class="day-label">THU</span><div class="day-content"><b>Pull Day</b><br>Pull-up / Assisted Pull-up 3x8<br>Bent-Over Barbell Row 3x10<br>Hammer Curl 3x12<br>Band Pull-Apart 3x20</div></div>
+          <div class="day-row"><span class="day-label">FRI</span><div class="day-content"><b>Treadmill — 25 min</b><br>Same as Tuesday</div></div>
+          <div class="day-row"><span class="day-label">SAT</span><div class="day-content"><b>Full Upper Body</b><br>DB Bench 3x12<br>Lat Pulldown 3x12<br>Lateral Raise 3x12<br>Cable Curl 3x12<br>Dips (assisted if needed) 3x10</div></div>
+          <div class="day-row"><span class="day-label">SUN</span><div class="day-content rest-day">Complete rest</div></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="phase2" style="display:none">
+    <div class="phase-box" style="border-left-color:#10b981">
+      <div class="phase-title" style="color:#34d399">Phase 2 — Build (Weeks 4-7)</div>
+      <div class="phase-desc">Increase weight progressively. Add supersets on Saturday. Treadmill introduces incline and longer intervals. RPE should reach 7/10 on working sets.</div>
+      <div class="week-grid">
+
+        <div class="week-card">
+          <div class="week-header"><span class="week-num">Week 4</span><span class="week-tag tag-progress">Build</span></div>
+          <div class="day-row"><span class="day-label">MON</span><div class="day-content"><b>Push — 4 sets</b><br>Barbell or DB Bench 4x8<br>Seated Shoulder Press 4x10<br>Incline DB Fly 3x12<br>Tricep Pushdown 3x12</div></div>
+          <div class="day-row"><span class="day-label">TUE</span><div class="day-content"><b>Treadmill — 30 min</b><br>3x5-min jog at 4.5-5 mph<br>2-min walk between; 5 min cooldown</div></div>
+          <div class="day-row"><span class="day-label">WED</span><div class="day-content rest-day">Rest</div></div>
+          <div class="day-row"><span class="day-label">THU</span><div class="day-content"><b>Pull — 4 sets</b><br>Pull-ups 4x6-8<br>Barbell Row 4x8<br>DB Curl 3x12<br>Face Pull 3x15</div></div>
+          <div class="day-row"><span class="day-label">FRI</span><div class="day-content"><b>Treadmill — 30 min</b><br>Incline walk 5 min (2-3% grade)<br>3x5-min jog intervals<br>5 min cooldown</div></div>
+          <div class="day-row"><span class="day-label">SAT</span><div class="day-content"><b>Full Upper — Supersets</b><br>A1: DB Bench 3x10 / A2: Cable Row 3x10<br>B1: Shoulder Press 3x10 / B2: Lat Pulldown 3x10<br>C1: Curl 3x12 / C2: Tricep Ext 3x12</div></div>
+          <div class="day-row"><span class="day-label">SUN</span><div class="day-content rest-day">Rest</div></div>
+        </div>
+
+        <div class="week-card">
+          <div class="week-header"><span class="week-num">Week 5</span><span class="week-tag tag-progress">Build</span></div>
+          <div class="day-row"><span class="day-label">MON</span><div class="day-content"><b>Push — heavier</b><br>Bench Press 4x6-8<br>Arnold Press 4x10<br>Cable Fly 3x12<br>Overhead Tricep Ext 3x12</div></div>
+          <div class="day-row"><span class="day-label">TUE</span><div class="day-content"><b>Treadmill — 30 min</b><br>4x5-min jog at 4.5-5 mph<br>90-sec walk recoveries</div></div>
+          <div class="day-row"><span class="day-label">WED</span><div class="day-content rest-day">Rest</div></div>
+          <div class="day-row"><span class="day-label">THU</span><div class="day-content"><b>Pull — heavier</b><br>Pull-ups 4x8<br>T-Bar or Barbell Row 4x8<br>Incline Curl 3x12<br>Rear Delt Fly 3x15</div></div>
+          <div class="day-row"><span class="day-label">FRI</span><div class="day-content"><b>Treadmill — 32 min</b><br>2 min walk then 3x8 min jog<br>2 min walk between</div></div>
+          <div class="day-row"><span class="day-label">SAT</span><div class="day-content"><b>Full Upper — Supersets</b><br>A1: Incline Bench 3x10 / A2: Row 3x10<br>B1: Lateral Raise 3x12 / B2: Face Pull 3x15<br>C1: Hammer Curl 3x12 / C2: Dips 3x10</div></div>
+          <div class="day-row"><span class="day-label">SUN</span><div class="day-content rest-day">Rest</div></div>
+        </div>
+
+        <div class="week-card">
+          <div class="week-header"><span class="week-num">Week 6</span><span class="week-tag tag-progress">Build</span></div>
+          <div class="day-row"><span class="day-label">MON</span><div class="day-content"><b>Push</b><br>Bench 4x8 (same or +5 lbs)<br>DB Shoulder Press 4x10<br>Incline Fly 3x12<br>Skull Crusher 3x10</div></div>
+          <div class="day-row"><span class="day-label">TUE</span><div class="day-content"><b>Treadmill — 30 min</b><br>Incline intervals: 5x3 min at 3-4% incline<br>2 min flat walk between</div></div>
+          <div class="day-row"><span class="day-label">WED</span><div class="day-content rest-day">Rest</div></div>
+          <div class="day-row"><span class="day-label">THU</span><div class="day-content"><b>Pull</b><br>Wide-Grip Pull-up 4x6-8<br>Seated Cable Row 4x10<br>Preacher Curl 3x12<br>Band Pull-Apart 3x20</div></div>
+          <div class="day-row"><span class="day-label">FRI</span><div class="day-content"><b>Treadmill — 35 min</b><br>5 min walk then 25 min steady jog<br>5 min cooldown</div></div>
+          <div class="day-row"><span class="day-label">SAT</span><div class="day-content"><b>Full Upper — Supersets</b><br>A1: Barbell Bench 4x8 / A2: Lat Pulldown 4x8<br>B1: Seated Press 3x10 / B2: Cable Row 3x10<br>C1: Curl 3x12 / C2: Tricep Pushdown 3x12</div></div>
+          <div class="day-row"><span class="day-label">SUN</span><div class="day-content rest-day">Rest</div></div>
+        </div>
+
+        <div class="week-card">
+          <div class="week-header"><span class="week-num">Week 7</span><span class="week-tag tag-progress">Deload</span></div>
+          <div class="day-row"><span class="day-label">NOTE</span><div class="day-content" style="color:#fbbf24"><b>Deload Week — reduce weight 20%, same reps. Let your body recover. Joints and tendons need this.</b></div></div>
+          <div class="day-row"><span class="day-label">MON</span><div class="day-content"><b>Push — light</b><br>DB Bench 3x10 (80% of Wk 6 weight)<br>Shoulder Press 3x10<br>Pushups 2x15</div></div>
+          <div class="day-row"><span class="day-label">TUE</span><div class="day-content"><b>Treadmill — 25 min brisk walk</b><br>No running this week</div></div>
+          <div class="day-row"><span class="day-label">WED</span><div class="day-content rest-day">Rest</div></div>
+          <div class="day-row"><span class="day-label">THU</span><div class="day-content"><b>Pull — light</b><br>Lat Pulldown 3x10<br>Cable Row 3x10<br>Curls 3x12</div></div>
+          <div class="day-row"><span class="day-label">FRI</span><div class="day-content"><b>Treadmill — 25 min</b><br>Brisk incline walk (2% grade)</div></div>
+          <div class="day-row"><span class="day-label">SAT</span><div class="day-content"><b>Full Body light</b><br>1 set each main movement, moderate weight</div></div>
+          <div class="day-row"><span class="day-label">SUN</span><div class="day-content rest-day">Rest</div></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="phase3" style="display:none">
+    <div class="phase-box" style="border-left-color:#f97316">
+      <div class="phase-title" style="color:#fb923c">Phase 3 — Peak (Weeks 8-10)</div>
+      <div class="phase-desc">Push heavier weights, 3-4 sets of 6-8 reps. Treadmill sessions become your hardest yet — interval sprints and longer steady runs. You should feel strong and capable by Week 10.</div>
+      <div class="week-grid">
+
+        <div class="week-card">
+          <div class="week-header"><span class="week-num">Week 8</span><span class="week-tag tag-peak">Peak</span></div>
+          <div class="day-row"><span class="day-label">MON</span><div class="day-content"><b>Push — heavy</b><br>Bench Press 4x6 (best weight yet)<br>Seated DB Press 4x8<br>Incline Fly 3x10<br>Dips 3x8-10</div></div>
+          <div class="day-row"><span class="day-label">TUE</span><div class="day-content"><b>Treadmill — 35 min</b><br>8x1-min jogs at 5.5-6 mph<br>90-sec walk between each</div></div>
+          <div class="day-row"><span class="day-label">WED</span><div class="day-content rest-day">Rest</div></div>
+          <div class="day-row"><span class="day-label">THU</span><div class="day-content"><b>Pull — heavy</b><br>Pull-up 4x8<br>Barbell Row 4x6-8<br>DB Curl 4x10<br>Face Pull 3x15</div></div>
+          <div class="day-row"><span class="day-label">FRI</span><div class="day-content"><b>Treadmill — 35 min</b><br>5 min walk then 25 min steady jog at 5 mph<br>5 min cooldown</div></div>
+          <div class="day-row"><span class="day-label">SAT</span><div class="day-content"><b>Full Upper</b><br>Compound superset circuit<br>Bench / Row / Press / Pulldown<br>3 rounds, 8 reps each, 90-sec rest</div></div>
+          <div class="day-row"><span class="day-label">SUN</span><div class="day-content rest-day">Rest</div></div>
+        </div>
+
+        <div class="week-card">
+          <div class="week-header"><span class="week-num">Week 9</span><span class="week-tag tag-peak">Peak</span></div>
+          <div class="day-row"><span class="day-label">MON</span><div class="day-content"><b>Push</b><br>Bench 4x6 (increase if possible)<br>Arnold Press 4x8<br>Cable Fly 3x12<br>Overhead Tricep 3x10</div></div>
+          <div class="day-row"><span class="day-label">TUE</span><div class="day-content"><b>Treadmill — 38 min</b><br>10x1-min at 5.5-6.5 mph<br>90-sec walk recoveries</div></div>
+          <div class="day-row"><span class="day-label">WED</span><div class="day-content rest-day">Rest</div></div>
+          <div class="day-row"><span class="day-label">THU</span><div class="day-content"><b>Pull</b><br>Pull-ups 4x8-10<br>Pendlay Row 4x6<br>Incline DB Curl 3x10<br>Rear Delt Fly 3x12</div></div>
+          <div class="day-row"><span class="day-label">FRI</span><div class="day-content"><b>Treadmill — 40 min</b><br>5 min walk then 30 min jog<br>5 min cooldown</div></div>
+          <div class="day-row"><span class="day-label">SAT</span><div class="day-content"><b>Full Upper — 4 sets each</b><br>Incline Bench / Wide Row<br>DB Press / Lat Pulldown<br>Curl / Tricep Pushdown<br>Rest 60-90 sec between sets</div></div>
+          <div class="day-row"><span class="day-label">SUN</span><div class="day-content rest-day">Rest</div></div>
+        </div>
+
+        <div class="week-card">
+          <div class="week-header"><span class="week-num">Week 10</span><span class="week-tag tag-peak">Final Week</span></div>
+          <div class="day-row"><span class="day-label">MON</span><div class="day-content"><b>Push — personal best attempt</b><br>Bench 4x5 (max effort)<br>Shoulder Press 4x8<br>Fly 3x12<br>Dips 3x max reps</div></div>
+          <div class="day-row"><span class="day-label">TUE</span><div class="day-content"><b>Treadmill — 40 min</b><br>5 min walk then 30 min continuous jog<br>5 min cooldown walk</div></div>
+          <div class="day-row"><span class="day-label">WED</span><div class="day-content rest-day">Rest</div></div>
+          <div class="day-row"><span class="day-label">THU</span><div class="day-content"><b>Pull — personal best</b><br>Pull-ups 4x max reps<br>Barbell Row 4x6 heavy<br>Hammer Curl 4x10<br>Face Pull 3x15</div></div>
+          <div class="day-row"><span class="day-label">FRI</span><div class="day-content"><b>Treadmill — Final 40 min</b><br>5 min walk then 30 min steady jog<br>5 min cooldown</div></div>
+          <div class="day-row"><span class="day-label">SAT</span><div class="day-content"><b>Full Upper — Victory Round</b><br>Your best compound circuit:<br>Bench / Row / Press / Pull<br>4x8, whatever weight makes you proud</div></div>
+          <div class="day-row"><span class="day-label">SUN</span><div class="day-content rest-day">You earned this rest</div></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== OVERVIEW VIEW ===== -->
+<div id="view-overview" class="view">
+  <div class="overview-grid">
+    <div class="stat-card"><div class="stat-num">10</div><div class="stat-label">Weeks</div></div>
+    <div class="stat-card"><div class="stat-num">4</div><div class="stat-label">Days / Week</div></div>
+    <div class="stat-card"><div class="stat-num">3</div><div class="stat-label">Phases</div></div>
+  </div>
+  <div class="tip-box">
+    <div class="tip-title">Weekly Structure (every week)</div>
+    <ul class="tip-list">
+      <li><b>Mon</b> — Upper Body Push (chest, shoulders, triceps)</li>
+      <li><b>Tue</b> — Treadmill Cardio</li>
+      <li><b>Wed</b> — REST or light walk</li>
+      <li><b>Thu</b> — Upper Body Pull (back, biceps, rear delts)</li>
+      <li><b>Fri</b> — Treadmill Cardio</li>
+      <li><b>Sat</b> — Upper Body Full / Compound day</li>
+      <li><b>Sun</b> — REST</li>
+    </ul>
+  </div>
+  <div class="tip-box">
+    <div class="tip-title">Phase Goals</div>
+    <ul class="tip-list">
+      <li><b>Phase 1 (Wks 1-3):</b> Re-establish movement patterns, build connective tissue, learn treadmill zones</li>
+      <li><b>Phase 2 (Wks 4-7):</b> Add volume and intensity, introduce supersets, longer cardio intervals</li>
+      <li><b>Phase 3 (Wks 8-10):</b> Peak effort, heavier loads, challenging cardio finishes</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ===== TIPS VIEW ===== -->
+<div id="view-tips" class="view">
+  <div class="tip-box">
+    <div class="tip-title">Recovery and Nutrition Basics</div>
+    <ul class="tip-list">
+      <li>Aim for 0.7-1g of protein per lb of bodyweight daily (chicken, eggs, Greek yogurt, whey)</li>
+      <li>Sleep 7-9 hours — this is when muscle is actually built</li>
+      <li>Drink water before, during, and after every session</li>
+      <li>Post-workout: protein + carb within 60 min (e.g. shake + banana)</li>
+    </ul>
+  </div>
+  <div class="tip-box">
+    <div class="tip-title">Heart Rate Zones (Treadmill Guide)</div>
+    <ul class="tip-list">
+      <li><b>Zone 2 (warm-up/cooldown):</b> ~100-115 bpm — can hold full conversation</li>
+      <li><b>Zone 3 (steady cardio):</b> ~115-135 bpm — can speak in short sentences</li>
+      <li><b>Zone 4 (intervals):</b> ~135-155 bpm — only a few words at a time</li>
+      <li>Estimated max HR at age 49: ~171 bpm — don't push above 90% in early weeks</li>
+    </ul>
+  </div>
+  <div class="tip-box">
+    <div class="tip-title">Joint and Age-Smart Rules</div>
+    <ul class="tip-list">
+      <li>Always do 5-10 min warm-up (arm circles, band pulls, light cardio) before lifting</li>
+      <li>Prioritize rotator cuff health — include face pulls and rear delt work every week</li>
+      <li>If joints feel sore (not just sore muscles), take an extra rest day — no exceptions</li>
+      <li>Control the descent on every rep; don't use momentum to cheat</li>
+      <li>Consider fish oil and magnesium supplementation to support joint health and sleep</li>
+    </ul>
+  </div>
+  <div class="tip-box">
+    <div class="tip-title">Progressive Overload Rules</div>
+    <ul class="tip-list">
+      <li>Only increase weight when you complete all reps with clean form</li>
+      <li>Add 5 lbs on upper body when ready (2.5 lb increments on isolation work)</li>
+      <li>Track your weights in a notebook or app — you can't improve what you don't track</li>
+      <li>The deload in Week 7 is not optional — it prevents injury and consolidates gains</li>
+    </ul>
+  </div>
+  <div class="tip-box">
+    <div class="tip-title">Before You Start</div>
+    <ul class="tip-list">
+      <li>If you haven't had a physical recently, consider checking in with your doctor first</li>
+      <li>Stop any exercise and consult a doctor if you feel chest pain, dizziness, or unusual shortness of breath</li>
+      <li>It's normal to feel sore in weeks 1-2 — it should feel manageable, not debilitating</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ===== BOTTOM NAV ===== -->
+<div id="bottomNav">
+  <button data-view="today" onclick="showView('today')"><span class="nav-icon">📅</span><span class="nav-label">Today</span></button>
+  <button data-view="weeks" onclick="showView('weeks')"><span class="nav-icon">📋</span><span class="nav-label">Weeks</span></button>
+  <button data-view="overview" onclick="showView('overview')"><span class="nav-icon">📊</span><span class="nav-label">Overview</span></button>
+  <button data-view="tips" onclick="showView('tips')"><span class="nav-icon">💡</span><span class="nav-label">Tips</span></button>
+</div>
+
+<script>
+/* ---------------- Bottom nav / view switching ---------------- */
+function showView(view) {
+  document.querySelectorAll('.view').forEach(function(el) { el.classList.remove('active'); });
+  document.getElementById('view-' + view).classList.add('active');
+  document.querySelectorAll('#bottomNav button').forEach(function(btn) {
+    btn.classList.toggle('active', btn.dataset.view === view);
+  });
+  window.scrollTo(0, 0);
+}
+
+/* ---------------- Weeks view sub-tabs ---------------- */
+function showPhase(phase) {
+  var phases = ['phase1', 'phase2', 'phase3'];
+  phases.forEach(function(p) { document.getElementById(p).style.display = p === phase ? 'block' : 'none'; });
+  document.querySelectorAll('.phase-tabs .tab').forEach(function(tab) {
+    tab.classList.toggle('active', tab.dataset.phase === phase);
+  });
+}
+
+/* ---------------- Today view data ---------------- */
+var DAY_KEYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+var WEEKS = [
+  {tag:'Foundation', cls:'tag-build', days:{
+    MON:{title:'Push Day', items:['DB Bench Press 3x10','Shoulder Press (DB) 3x10','Incline Push-up 2x12','Tricep Overhead Extension 3x12']},
+    TUE:{title:'Treadmill — 20 min', items:['5 min easy walk warm-up','10 min brisk walk (3.5-4 mph)','5 min cooldown walk']},
+    WED:{rest:true, text:'Rest or 15-min light walk'},
+    THU:{title:'Pull Day', items:['Seated Cable Row 3x10','Lat Pulldown 3x10','DB Bicep Curl 3x12','Face Pull (cable/band) 3x15']},
+    FRI:{title:'Treadmill — 20 min', items:['Same as Tuesday']},
+    SAT:{title:'Full Upper Body', items:['DB Bench 3x10','Bent-Over DB Row 3x10','Lateral Raise 3x12','Hammer Curl 3x12','Tricep Pushdown 3x12']},
+    SUN:{rest:true, text:'Complete rest'}
+  }},
+  {tag:'Foundation', cls:'tag-build', days:{
+    MON:{title:'Push Day', items:['DB Bench 3x10 (slight weight increase)','Arnold Press 3x10','Cable Chest Fly 3x12','Skull Crusher 3x12']},
+    TUE:{title:'Treadmill — 25 min', items:['5 min walk then 15 min at 3.8-4.2 mph','5 min cooldown']},
+    WED:{rest:true, text:'Rest or light walk'},
+    THU:{title:'Pull Day', items:['Lat Pulldown 3x10','1-Arm DB Row 3x10 each side','Incline DB Curl 3x12','Rear Delt Fly 3x15']},
+    FRI:{title:'Treadmill — 25 min', items:['Same as Tuesday']},
+    SAT:{title:'Full Upper Body', items:['Incline DB Press 3x10','Seated Cable Row 3x10','DB Shoulder Press 3x10','EZ-Bar Curl 3x12','Overhead Tricep Ext 3x12']},
+    SUN:{rest:true, text:'Complete rest'}
+  }},
+  {tag:'Foundation', cls:'tag-build', days:{
+    MON:{title:'Push Day', items:['Flat DB Bench 3x12','DB Shoulder Press 3x12','Incline DB Fly 3x12','Close-Grip Pushup 2x max']},
+    TUE:{title:'Treadmill — 25 min', items:['Introduce 2x3-min jog intervals','Walk 2 min between each']},
+    WED:{rest:true, text:'Rest or light walk'},
+    THU:{title:'Pull Day', items:['Pull-up / Assisted Pull-up 3x8','Bent-Over Barbell Row 3x10','Hammer Curl 3x12','Band Pull-Apart 3x20']},
+    FRI:{title:'Treadmill — 25 min', items:['Same as Tuesday']},
+    SAT:{title:'Full Upper Body', items:['DB Bench 3x12','Lat Pulldown 3x12','Lateral Raise 3x12','Cable Curl 3x12','Dips (assisted if needed) 3x10']},
+    SUN:{rest:true, text:'Complete rest'}
+  }},
+  {tag:'Build', cls:'tag-progress', days:{
+    MON:{title:'Push — 4 sets', items:['Barbell or DB Bench 4x8','Seated Shoulder Press 4x10','Incline DB Fly 3x12','Tricep Pushdown 3x12']},
+    TUE:{title:'Treadmill — 30 min', items:['3x5-min jog at 4.5-5 mph','2-min walk between; 5 min cooldown']},
+    WED:{rest:true, text:'Rest'},
+    THU:{title:'Pull — 4 sets', items:['Pull-ups 4x6-8','Barbell Row 4x8','DB Curl 3x12','Face Pull 3x15']},
+    FRI:{title:'Treadmill — 30 min', items:['Incline walk 5 min (2-3% grade)','3x5-min jog intervals','5 min cooldown']},
+    SAT:{title:'Full Upper — Supersets', items:['A1: DB Bench 3x10 / A2: Cable Row 3x10','B1: Shoulder Press 3x10 / B2: Lat Pulldown 3x10','C1: Curl 3x12 / C2: Tricep Ext 3x12']},
+    SUN:{rest:true, text:'Rest'}
+  }},
+  {tag:'Build', cls:'tag-progress', days:{
+    MON:{title:'Push — heavier', items:['Bench Press 4x6-8','Arnold Press 4x10','Cable Fly 3x12','Overhead Tricep Ext 3x12']},
+    TUE:{title:'Treadmill — 30 min', items:['4x5-min jog at 4.5-5 mph','90-sec walk recoveries']},
+    WED:{rest:true, text:'Rest'},
+    THU:{title:'Pull — heavier', items:['Pull-ups 4x8','T-Bar or Barbell Row 4x8','Incline Curl 3x12','Rear Delt Fly 3x15']},
+    FRI:{title:'Treadmill — 32 min', items:['2 min walk then 3x8 min jog','2 min walk between']},
+    SAT:{title:'Full Upper — Supersets', items:['A1: Incline Bench 3x10 / A2: Row 3x10','B1: Lateral Raise 3x12 / B2: Face Pull 3x15','C1: Hammer Curl 3x12 / C2: Dips 3x10']},
+    SUN:{rest:true, text:'Rest'}
+  }},
+  {tag:'Build', cls:'tag-progress', days:{
+    MON:{title:'Push', items:['Bench 4x8 (same or +5 lbs)','DB Shoulder Press 4x10','Incline Fly 3x12','Skull Crusher 3x10']},
+    TUE:{title:'Treadmill — 30 min', items:['Incline intervals: 5x3 min at 3-4% incline','2 min flat walk between']},
+    WED:{rest:true, text:'Rest'},
+    THU:{title:'Pull', items:['Wide-Grip Pull-up 4x6-8','Seated Cable Row 4x10','Preacher Curl 3x12','Band Pull-Apart 3x20']},
+    FRI:{title:'Treadmill — 35 min', items:['5 min walk then 25 min steady jog','5 min cooldown']},
+    SAT:{title:'Full Upper — Supersets', items:['A1: Barbell Bench 4x8 / A2: Lat Pulldown 4x8','B1: Seated Press 3x10 / B2: Cable Row 3x10','C1: Curl 3x12 / C2: Tricep Pushdown 3x12']},
+    SUN:{rest:true, text:'Rest'}
+  }},
+  {tag:'Deload', cls:'tag-progress', note:'Deload Week — reduce weight 20%, same reps. Let your body recover. Joints and tendons need this.', days:{
+    MON:{title:'Push — light', items:['DB Bench 3x10 (80% of Wk 6 weight)','Shoulder Press 3x10','Pushups 2x15']},
+    TUE:{title:'Treadmill — 25 min brisk walk', items:['No running this week']},
+    WED:{rest:true, text:'Rest'},
+    THU:{title:'Pull — light', items:['Lat Pulldown 3x10','Cable Row 3x10','Curls 3x12']},
+    FRI:{title:'Treadmill — 25 min', items:['Brisk incline walk (2% grade)']},
+    SAT:{title:'Full Body light', items:['1 set each main movement, moderate weight']},
+    SUN:{rest:true, text:'Rest'}
+  }},
+  {tag:'Peak', cls:'tag-peak', days:{
+    MON:{title:'Push — heavy', items:['Bench Press 4x6 (best weight yet)','Seated DB Press 4x8','Incline Fly 3x10','Dips 3x8-10']},
+    TUE:{title:'Treadmill — 35 min', items:['8x1-min jogs at 5.5-6 mph','90-sec walk between each']},
+    WED:{rest:true, text:'Rest'},
+    THU:{title:'Pull — heavy', items:['Pull-up 4x8','Barbell Row 4x6-8','DB Curl 4x10','Face Pull 3x15']},
+    FRI:{title:'Treadmill — 35 min', items:['5 min walk then 25 min steady jog at 5 mph','5 min cooldown']},
+    SAT:{title:'Full Upper', items:['Compound superset circuit','Bench / Row / Press / Pulldown','3 rounds, 8 reps each, 90-sec rest']},
+    SUN:{rest:true, text:'Rest'}
+  }},
+  {tag:'Peak', cls:'tag-peak', days:{
+    MON:{title:'Push', items:['Bench 4x6 (increase if possible)','Arnold Press 4x8','Cable Fly 3x12','Overhead Tricep 3x10']},
+    TUE:{title:'Treadmill — 38 min', items:['10x1-min at 5.5-6.5 mph','90-sec walk recoveries']},
+    WED:{rest:true, text:'Rest'},
+    THU:{title:'Pull', items:['Pull-ups 4x8-10','Pendlay Row 4x6','Incline DB Curl 3x10','Rear Delt Fly 3x12']},
+    FRI:{title:'Treadmill — 40 min', items:['5 min walk then 30 min jog','5 min cooldown']},
+    SAT:{title:'Full Upper — 4 sets each', items:['Incline Bench / Wide Row','DB Press / Lat Pulldown','Curl / Tricep Pushdown','Rest 60-90 sec between sets']},
+    SUN:{rest:true, text:'Rest'}
+  }},
+  {tag:'Final Week', cls:'tag-peak', days:{
+    MON:{title:'Push — personal best attempt', items:['Bench 4x5 (max effort)','Shoulder Press 4x8','Fly 3x12','Dips 3x max reps']},
+    TUE:{title:'Treadmill — 40 min', items:['5 min walk then 30 min continuous jog','5 min cooldown walk']},
+    WED:{rest:true, text:'Rest'},
+    THU:{title:'Pull — personal best', items:['Pull-ups 4x max reps','Barbell Row 4x6 heavy','Hammer Curl 4x10','Face Pull 3x15']},
+    FRI:{title:'Treadmill — Final 40 min', items:['5 min walk then 30 min steady jog','5 min cooldown']},
+    SAT:{title:'Full Upper — Victory Round', items:['Your best compound circuit:','Bench / Row / Press / Pull','4x8, whatever weight makes you proud']},
+    SUN:{rest:true, text:'You earned this rest'}
+  }}
+];
+
+var currentWeek = 1;
+var currentDay = 'MON';
+
+function loadState() {
+  currentWeek = parseInt(localStorage.getItem('currentWeek') || '1', 10);
+  currentDay = localStorage.getItem('currentDay') || 'MON';
+
+  var startDate = localStorage.getItem('planStartDate');
+  if (startDate) {
+    var start = new Date(startDate + 'T00:00:00');
+    var today = new Date();
+    today.setHours(0,0,0,0);
+    var diffDays = Math.floor((today - start) / 86400000);
+    if (diffDays >= 0) {
+      var weekFromDate = Math.min(10, Math.floor(diffDays / 7) + 1);
+      var jsDay = today.getDay(); // 0 = Sun
+      var dayFromDate = DAY_KEYS[(jsDay + 6) % 7]; // map Sun(0)->SUN index6, Mon(1)->MON index0
+      currentWeek = weekFromDate;
+      currentDay = dayFromDate;
+    }
+  }
+}
+
+function saveState() {
+  localStorage.setItem('currentWeek', currentWeek);
+  localStorage.setItem('currentDay', currentDay);
+}
+
+function stepWeek(delta) {
+  currentWeek = Math.max(1, Math.min(10, currentWeek + delta));
+  saveState();
+  renderToday();
+}
+
+function selectDay(day) {
+  currentDay = day;
+  saveState();
+  renderToday();
+}
+
+function renderStartDateRow() {
+  var row = document.getElementById('startDateRow');
+  var saved = localStorage.getItem('planStartDate');
+  if (saved) {
+    row.innerHTML = 'Plan started ' + saved + ' &nbsp;·&nbsp; <a onclick="resetStartDate()">change</a>';
+  } else {
+    row.innerHTML = 'Set your start date: <input type="date" id="startDateInput"> <a onclick="saveStartDate()">save</a>';
+  }
+}
+
+function saveStartDate() {
+  var val = document.getElementById('startDateInput').value;
+  if (val) {
+    localStorage.setItem('planStartDate', val);
+    loadState();
+    renderStartDateRow();
+    renderToday();
+  }
+}
+
+function resetStartDate() {
+  localStorage.removeItem('planStartDate');
+  renderStartDateRow();
+}
+
+function renderToday() {
+  document.getElementById('weekLabel').textContent = 'Week ' + currentWeek + ' of 10';
+
+  var pillsEl = document.getElementById('dayPills');
+  pillsEl.innerHTML = '';
+  DAY_KEYS.forEach(function(d) {
+    var btn = document.createElement('button');
+    btn.className = 'day-pill' + (d === currentDay ? ' active' : '');
+    btn.textContent = d;
+    btn.onclick = function() { selectDay(d); };
+    pillsEl.appendChild(btn);
+  });
+
+  var week = WEEKS[currentWeek - 1];
+  var dayData = week.days[currentDay];
+  var card = document.getElementById('todayCard');
+
+  if (dayData.rest) {
+    card.innerHTML = '<div class="today-card rest-card">🛌<br><br>' + dayData.text + '</div>';
+    return;
+  }
+
+  var html = '<div class="today-card">';
+  html += '<div class="today-card-title">' + dayData.title + '</div>';
+  html += '<div class="today-card-phase">Week ' + currentWeek + ' · <span class="week-tag ' + week.cls + '">' + week.tag + '</span></div>';
+  if (week.note) {
+    html += '<div style="color:#fbbf24; font-size:0.78rem; margin-bottom:14px;"><b>' + week.note + '</b></div>';
+  }
+  html += '</div>';
+  card.innerHTML = html;
+
+  var cardEl = card.querySelector('.today-card');
+  dayData.items.forEach(function(item, i) {
+    var key = 'progress_w' + currentWeek + '_' + currentDay + '_' + i;
+    var checked = localStorage.getItem(key) === '1';
+
+    var row = document.createElement('div');
+    row.className = 'exercise-row' + (checked ? ' checked' : '');
+
+    var checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = 'chk-' + i;
+    checkbox.checked = checked;
+    checkbox.addEventListener('change', function() { toggleExercise(row, checkbox, key); });
+
+    var label = document.createElement('label');
+    label.htmlFor = 'chk-' + i;
+    label.textContent = item;
+
+    row.appendChild(checkbox);
+    row.appendChild(label);
+    cardEl.appendChild(row);
+  });
+}
+
+function toggleExercise(row, checkbox, key) {
+  if (checkbox.checked) {
+    localStorage.setItem(key, '1');
+    row.classList.add('checked');
+  } else {
+    localStorage.removeItem(key);
+    row.classList.remove('checked');
+  }
+}
+
+/* ---------------- iOS install banner ---------------- */
+function isStandalone() {
+  return window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+}
+function isIOS() {
+  return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+}
+if (isIOS() && !isStandalone() && !localStorage.getItem('hideInstallBanner')) {
+  document.getElementById('installBanner').style.display = 'block';
+}
+document.querySelector('#installBanner .close-banner').addEventListener('click', function() {
+  localStorage.setItem('hideInstallBanner', '1');
+});
+
+/* ---------------- Init ---------------- */
+loadState();
+renderStartDateRow();
+renderToday();
+</script>
+</body>
+</html>
